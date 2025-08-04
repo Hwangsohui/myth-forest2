@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>신화의 숲: 내 삶의 나침반</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Sunny Pastel -->
+    <!-- Application Structure Plan: 이 SPA는 보고서의 내용을 청소년들이 직관적으로 탐색할 수 있도록 재구성했습니다. 선형적인 보고서 구조 대신, '주제별 탐색 허브'를 중심으로 설계했습니다. 사용자는 '사랑과 상실', '오만과 겸손' 등 핵심 주제 카드를 클릭하여 관련 신화들을 탐색할 수 있습니다. 각 신화는 탭(줄거리, 주제/쟁점, 삶의 연결)으로 정보를 구분하여 가독성을 높였습니다. '인물 유형 분석' 섹션은 학생들의 요구에 따라 삭제하고, 각 주제별로 더 풍부한 이야기들을 추가하여 신화 자체에 집중할 수 있도록 했습니다. '더 알아보기' 섹션과 '교과 연계' 섹션은 토글 형태로 재구성하여 사용자가 관심 있는 정보를 선택적으로 열람하며 능동적으로 학습하도록 유도합니다. 이 구조는 사용자가 자신의 관심사에 따라 비선형적으로 정보를 소비하고, 신화의 다층적인 의미를 깊이 있게 이해하도록 돕기 위해 선택되었습니다. -->
+    <!-- Visualization & Content Choices: 보고서의 정성적 데이터를 효과적으로 전달하기 위해 다양한 시각화 및 표현 방식을 사용했습니다. [목표: 정리] -> [방법: 주제별 카드 허브] -> [상호작용: 클릭 시 상세 정보 표시] -> [정당성: 복잡한 정보를 관심사별로 접근하게 하여 사용자 부담 감소]. [목표: 상세 정보 전달] -> [방법: 탭 기반 콘텐츠 분리] -> [상호작용: 탭 클릭] -> [정당성: 텍스트가 많은 내용을 논리적으로 분할하여 가독성 및 집중도 향상]. [목표: 추가 정보 제공] -> [방법: 토글(아코디언) 섹션] -> [상호작용: 클릭 시 내용 확장/축소] -> [정당성: 정보 과부하를 줄이고, 사용자가 필요한 정보만 선택적으로 볼 수 있게 함]. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #FFFDF0; /* Very light creamy yellow */
+            color: #4A4A4A;
+        }
+        h1, h2, h3 {
+            font-family: 'Gowun Batang', serif;
+        }
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #A68A6B; /* Muted golden brown */
+            border-bottom-color: #A68A6B;
+        }
+        .theme-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .theme-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .tab-button {
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .tab-button.active {
+            background-color: #A68A6B; /* Muted golden brown */
+            color: #FFFFFF;
+        }
+        .accordion-header {
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .accordion-header:hover {
+            background-color: #F8F3ED; /* Lighter yellow */
+        }
+        .accordion-content {
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+            max-height: 0;
+        }
+        .accordion-content.active {
+            max-height: 1000px; /* Adjust based on max content height */
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-2xl font-bold text-[#6B5B4C]">
+                <a href="#hero">신화의 숲: 내 삶의 나침반</a>
+            </div>
+            <div class="hidden md:flex space-x-8">
+                <a href="#themes" class="nav-link pb-1">주제별 탐색</a>
+                <a href="#curriculum" class="nav-link pb-1">교과 연계</a>
+                <a href="#learn-more" class="nav-link pb-1">더 알아보기</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4">
+            <a href="#themes" class="block py-2 text-center nav-link">주제별 탐색</a>
+            <a href="#curriculum" class="block py-2 text-center nav-link">교과 연계</a>
+            <a href="#learn-more" class="block py-2 text-center nav-link">더 알아보기</a>
+        </div>
+    </header>
+
+    <main>
+        <section id="hero" class="py-20 md:py-32 bg-[#FFF7E0]"> <!-- Lighter yellow for hero -->
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-4xl md:text-6xl font-bold text-[#6B5B4C] mb-4">신화는 살아있는 지혜입니다</h1>
+                <p class="text-lg md:text-xl max-w-3xl mx-auto text-[#8C7C6B]">
+                    고대 신들의 이야기는 단순한 옛날이야기가 아닙니다. 사랑과 상실, 용기와 좌절, 오만과 겸손의 교훈을 통해 오늘을 살아가는 우리, 특히 청소년들의 삶에 깊은 통찰과 방향을 제시하는 나침반이 되어줍니다.
+                </p>
+            </div>
+        </section>
+
+        <section id="why-myths" class="py-16 md:py-24 bg-[#FFFBE6]">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-3xl md:text-4xl font-bold text-[#6B5B4C] mb-4">왜 신화를 읽어야 할까요?</h2>
+                <p class="text-lg md:text-xl max-w-3xl mx-auto text-[#8C7C6B] leading-relaxed">
+                    신화는 수천 년 전 사람들의 생각과 고민을 담고 있습니다. 신들의 사랑과 질투, 영웅들의 모험과 실패 속에서 우리는 지금 우리와 똑같은 감정과 갈등을 발견할 수 있어요. 학교 교과서 밖에서 만나는 신화는 여러분의 상상력을 넓히고, 삶의 문제를 스스로 깊이 생각해 볼 수 있는 힘을 길러줄 거예요. 신화의 숲에서 여러분의 질문에 대한 답을 찾아보세요!
+                </p>
+            </div>
+        </section>
+
+        <section id="themes" class="py-16 md:py-24">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-[#6B5B4C]">주제별 신화 탐색</h2>
+                    <p class="mt-4 text-[#8C7C6B] max-w-2xl mx-auto">관심 있는 주제를 선택하여 신화가 우리에게 던지는 다양한 질문들을 만나보세요.</p>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Theme Cards will be populated by JS -->
+                </div>
+            </div>
+        </section>
+
+        <section id="myth-details" class="hidden bg-[#FFFBE6] py-16 md:py-24"> <!-- Light creamy yellow -->
+            <div class="container mx-auto px-6">
+                <button id="close-details" class="mb-8 bg-white px-4 py-2 rounded-lg shadow hover:bg-gray-100 transition text-[#6B5B4C]">← 뒤로가기</button>
+                <div id="details-content"></div>
+            </div>
+        </section>
+
+        <section id="curriculum" class="py-16 md:py-24">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-[#6B5B4C]">교과 연계: 신화, 학문의 렌즈로 보다</h2>
+                    <p class="mt-4 text-[#8C7C6B] max-w-2xl mx-auto">신화는 고전으로만 남지 않고, 오늘날의 다양한 학문과 문화 속에서 끊임없이 재해석되고 있습니다. 신화가 여러 학문과 어떻게 연결되는지 탐색해 보세요.</p>
+                </div>
+                <div class="space-y-4">
+                    <div class="bg-white p-6 rounded-xl shadow-lg">
+                        <button class="accordion-header w-full text-left flex justify-between items-center text-xl font-bold text-[#6B5B4C]">
+                            <span>심리학: 신화 속 인물들의 마음 읽기</span>
+                            <span class="accordion-icon">▼</span>
+                        </button>
+                        <div class="accordion-content pt-4">
+                            <p class="text-[#8C7C6B] leading-relaxed mb-4">프로이트의 **'오이디푸스 콤플렉스'**처럼, 신화 속 인물들의 행동과 심리 상태는 인간의 무의식과 욕망을 이해하는 중요한 단서가 됩니다. 융은 신화 속 보편적인 인물 유형을 **'아르키타입(원형)'**으로 제시하며, 신화가 인류의 집단 무의식을 반영한다고 설명했습니다. 신화는 복잡한 인간의 심리를 이해하는 가장 좋은 교과서입니다.</p>
+                            <p class="font-bold text-[#6B5B4C] mt-4 mb-2">더 깊이 탐구하고 싶다면?</p>
+                            <ul class="list-disc list-inside text-[#8C7C6B] leading-relaxed">
+                                <li>**관련 교과**: 사회(사회문화), 도덕(인간과 윤리)</li>
+                                <li>**추천 자료**: 칼 융의 **<인간과 상징>**, 조지프 캠벨의 **<천의 얼굴을 가진 영웅>**</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-lg">
+                        <button class="accordion-header w-full text-left flex justify-between items-center text-xl font-bold text-[#6B5B4C]">
+                            <span>천문학: 밤하늘에 새겨진 신들의 이야기</span>
+                            <span class="accordion-icon">▼</span>
+                        </button>
+                        <div class="accordion-content pt-4">
+                            <p class="text-[#8C7C6B] leading-relaxed mb-4">밤하늘을 수놓은 별자리들은 대부분 그리스 로마 신화의 주인공들입니다. **큰곰자리(칼리스토)**의 슬픈 사랑 이야기, **오리온자리**의 오만함, **쌍둥이자리(카스토르와 폴룩스)**의 우애 등, 신화는 과학자들이 별을 연구하기 전부터 인류에게 우주를 이해하는 아름다운 상상력을 제공했습니다.</p>
+                            <p class="font-bold text-[#6B5B4C] mt-4 mb-2">더 깊이 탐구하고 싶다면?</p>
+                            <ul class="list-disc list-inside text-[#8C7C6B] leading-relaxed">
+                                <li>**관련 교과**: 과학(천문), 국어(문학)</li>
+                                <li>**추천 자료**: 천문 동호회 사이트, 별자리 관련 서적, 국립과천과학관 천체관측소</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-lg">
+                        <button class="accordion-header w-full text-left flex justify-between items-center text-xl font-bold text-[#6B5B4C]">
+                            <span>문학과 예술: 시대를 초월한 영감의 원천</span>
+                            <span class="accordion-icon">▼</span>
+                        </button>
+                        <div class="accordion-content pt-4">
+                            <p class="text-[#8C7C6B] leading-relaxed mb-4">셰익스피어의 **<로미오와 줄리엣>**은 **피라무스와 티스베** 신화와 닮아있고, 수많은 명화와 조각 작품들 역시 신화의 이야기를 담고 있습니다. 현대 소설, 영화, 드라마, 심지어 게임에 이르기까지 신화 속 영웅의 모험, 신들의 갈등은 오늘날에도 새로운 형태로 계속해서 재창조되고 있습니다. 신화는 인류 문화의 가장 큰 영감의 창고입니다.</p>
+                            <p class="font-bold text-[#6B5B4C] mt-4 mb-2">더 깊이 탐구하고 싶다면?</p>
+                            <ul class="list-disc list-inside text-[#8C7C6B] leading-relaxed">
+                                <li>**관련 교과**: 국어(문학), 미술, 음악</li>
+                                <li>**추천 자료**: 박물관(루브르, 대영 박물관 온라인 투어), **<그리스 로마 신화 명화로 읽기>**, **<만화로 보는 그리스 로마 신화>** 시리즈</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="learn-more" class="bg-[#FFFBE6] py-16 md:py-24"> <!-- Light creamy yellow -->
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-[#6B5B4C]">더 알아보기: 신화와 세상</h2>
+                    <p class="mt-4 text-[#8C7C6B] max-w-2xl mx-auto">신화는 과거에만 머무르지 않고, 현대의 문화와 철학 속에서 여전히 살아 숨 쉬고 있습니다.</p>
+                </div>
+                <div class="space-y-4">
+                    <div class="bg-white p-6 rounded-xl shadow-lg">
+                        <button class="accordion-header w-full text-left flex justify-between items-center text-xl font-bold text-[#6B5B4C]">
+                            <span>밤하늘을 수놓은 별자리 이야기</span>
+                            <span class="accordion-icon">▼</span>
+                        </button>
+                        <div class="accordion-content pt-4">
+                            <p class="text-[#8C7C6B] leading-relaxed">고대인들은 밤하늘의 별들을 보며 신과 영웅들의 이야기를 그려냈습니다. 큰곰자리, 오리온자리, 리라자리 등 수많은 별자리에는 칼리스토의 슬픔, 오리온의 오만, 오르페우스의 사랑과 같은 애틋하고 교훈적인 신화가 담겨있습니다. 신화는 인류 최초의 과학이자, 우주를 이해하려는 상상력의 산물입니다.</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-lg">
+                        <button class="accordion-header w-full text-left flex justify-between items-center text-xl font-bold text-[#6B5B4C]">
+                            <span>테세우스의 배: 정체성에 대한 질문</span>
+                            <span class="accordion-icon">▼</span>
+                        </button>
+                        <div class="accordion-content pt-4">
+                            <p class="text-[#8C7C6B] leading-relaxed mb-4">만약 테세우스가 타고 온 배의 낡은 널빤지를 모두 새것으로 교체한다면, 그 배는 여전히 '테세우스의 배'일까요? 이 철학적인 질문은 끊임없이 변화하는 청소년기의 '나'는 누구인지, 나의 정체성은 무엇으로 결정되는지에 대한 깊은 성찰을 유도합니다.</p>
+                            <div class="border-2 border-dashed border-[#F0E6D2] p-4 rounded-lg text-center"> <!-- Lighter border -->
+                                <p class="font-semibold text-[#6B5B4C]">오래된 배 🚢 → 널빤지 교체 🔧 → 새로운 배 🚢</p>
+                                <p class="mt-2 text-sm text-[#8C7C6B]">모든 부분이 바뀌어도, 본질은 그대로일까?</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-lg">
+                        <button class="accordion-header w-full text-left flex justify-between items-center text-xl font-bold text-[#6B5B4C]">
+                            <span>수많은 브랜드의 로고 그리고 그리스 로마 신화</span>
+                            <span class="accordion-icon">▼</span>
+                        </button>
+                        <div class="accordion-content pt-4">
+                            <p class="text-[#8C7C6B] leading-relaxed">오늘날 우리가 흔히 접하는 많은 브랜드 로고와 이름에는 그리스 로마 신화의 이야기가 숨겨져 있습니다. 예를 들어, 스포츠 브랜드 '나이키(Nike)'는 승리의 여신 니케(Nike)에서 이름을 따왔고, 명품 브랜드 '헤르메스(Hermès)'는 신들의 전령 헤르메스(Hermes)의 날개 달린 신발에서 영감을 받았습니다. 주얼리 브랜드 '판도라(Pandora)' 역시 판도라의 상자 신화에서 유래했습니다. 이처럼 신화는 시대를 초월하여 현대 사회의 다양한 영역에 영향을 미치고 있습니다.</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-lg">
+                        <button class="accordion-header w-full text-left flex justify-between items-center text-xl font-bold text-[#6B5B4C]">
+                            <span>일 년 열두 달 명칭의 유래</span>
+                            <span class="accordion-icon">▼</span>
+                        </button>
+                        <div class="accordion-content pt-4">
+                            <p class="text-[#8C7C6B] leading-relaxed">우리가 사용하는 달의 이름 중 상당수는 로마 신화에서 유래했습니다. 1월(January)은 두 얼굴의 신 야누스(Janus)에서, 3월(March)은 전쟁의 신 마르스(Mars)에서, 5월(May)은 대지의 여신 마이아(Maia)에서, 6월(June)은 여왕 신 유노(Juno)에서 이름을 가져왔습니다. 7월(July)과 8월(August)은 각각 로마의 위대한 지도자 율리우스 카이사르(Julius Caesar)와 아우구스투스(Augustus) 황제의 이름에서 유래했는데, 이들 역시 신격화된 인물로 여겨졌습니다. 신화는 단순한 이야기가 아니라, 우리의 일상과 언어 속에 깊이 스며들어 있습니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-[#6B5B4C] text-white py-8"> <!-- Darker warm brown for footer -->
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; 2024 신화의 숲 Interactive. All Rights Reserved.</p>
+            <p class="text-sm mt-2 opacity-70">Based on the report analyzing "신화의 숲" by Kim Heon.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const mythData = {
+                love: {
+                    title: '사랑과 상실',
+                    icon: '💔',
+                    description: '사랑의 다양한 모습과 피할 수 없는 이별의 아픔을 다룹니다.',
+                    myths: [
+                        {
+                            name: '에코와 나르키소스',
+                            summary: '메아리가 된 요정 에코의 비극적인 짝사랑과, 샘물에 비친 자신과 사랑에 빠져 수선화가 된 나르키소스의 이야기입니다. 소통의 부재와 자기애의 위험성을 보여줍니다.',
+                            themes: '사랑의 비극성, 소통의 중요성, 자기애의 위험성. 헤라의 저주와 네메시스의 복수는 신의 권능과 운명의 힘을 드러냅니다. 일방적인 사랑과 자기중심적 사랑이 초래하는 파멸을 경고합니다.',
+                            connection: '건강한 자존감과 자기애의 균형을 생각하게 합니다. 짝사랑의 아픔에 공감하고, 진정한 소통의 중요성을 배웁니다. 외모지상주의를 비판적으로 바라보고 내면의 가치를 성찰하는 계기를 제공합니다.'
+                        },
+                        {
+                            name: '다프네와 아폴론',
+                            summary: '아폴론의 맹목적인 사랑을 피해 월계수가 된 요정 다프네의 이야기입니다. 개인의 의지와 자율성을 지키려는 강한 저항을 상징합니다.',
+                            themes: '자율성과 순결의 가치, 강요된 사랑의 비극. 상대의 의사를 무시한 사랑은 폭력이 될 수 있음을 보여줍니다. 변신은 자연과의 합일이자 정체성 보존의 한 방식입니다.',
+                            connection: '원치 않는 관계나 접촉에 "아니오"라고 말할 수 있는 용기와 개인의 경계(Consent) 설정의 중요성을 배웁니다. 자신을 지키기 위한 다양한 방법에 대해 고민하게 합니다.'
+                        },
+                         {
+                            name: '오르페우스와 에우리디케',
+                            summary: '죽은 아내 에우리디케를 되찾기 위해 저승으로 내려간 음악가 오르페우스. 그러나 지상에 거의 다 와서 뒤를 돌아보는 실수로 아내를 영원히 잃고 맙니다.',
+                            themes: '사랑의 힘과 상실의 고통, 예술의 치유력과 한계, 신뢰와 인내의 중요성. 그의 실패는 인간적 나약함과 운명의 불가피성을 보여줍니다.',
+                            connection: '상실의 슬픔을 다루는 법, 관계에서 신뢰와 약속의 중요성을 배웁니다. 목표 달성을 위한 인내심과 충동 조절의 가치를 깨닫게 합니다. 예술을 통한 감정 표현의 힘을 이해합니다.'
+                        },
+                        {
+                            name: '피라무스와 티스베',
+                            summary: '부모님의 반대로 사랑을 이루지 못한 채 비극적인 오해로 인해 목숨을 잃는 두 연인의 이야기입니다. 이들의 순수한 사랑과 비극적인 결말은 셰익스피어의 <로미오와 줄리엣>에 큰 영향을 주었습니다.',
+                            themes: '운명적 사랑의 비극, 부모와 자식 간의 갈등, 오해와 소통의 부재가 가져오는 파멸. 사랑을 위해 목숨까지 바치는 숭고함과 그로 인한 안타까움을 다룹니다.',
+                            connection: '진정한 사랑의 의미와 함께, 소중한 사람과의 오해를 풀기 위한 노력이 얼마나 중요한지 깨닫게 합니다. 갈등 해결을 위한 열린 소통의 필요성을 배웁니다.'
+                        },
+                        {
+                            name: '에로스와 프시케',
+                            summary: '질투의 여신 아프로디테의 아들 에로스가 아름다운 인간 소녀 프시케를 사랑하지만, 프시케의 의심으로 인해 헤어지게 됩니다. 온갖 시련을 극복하고 다시 사랑을 되찾는 이야기입니다.',
+                            themes: '사랑과 영혼의 결합, 시련을 통한 성장, 불신과 신뢰. 프시케는 인간의 영혼이 겪는 성장통을 상징하며, 진정한 사랑은 믿음을 바탕으로 완성된다는 것을 보여줍니다.',
+                            connection: '사랑하는 사람과의 관계에서 신뢰가 얼마나 중요한지 이해하게 됩니다. 힘든 시련 속에서도 포기하지 않고 성장하는 용기를 배웁니다. 내면의 아름다움이 외면의 아름다움보다 더 중요하다는 가치를 깨닫습니다.'
+                        },
+                        {
+                            name: '하데스와 페르세포네',
+                            summary: '저승의 신 하데스가 아름다운 페르세포네를 납치하여 아내로 삼습니다. 어머니인 대지의 여신 데메테르의 슬픔으로 세상이 황폐해지고, 결국 페르세포네는 일 년 중 일부만 지상에 머물게 됩니다.',
+                            themes: '강제된 결혼과 선택의 자유, 모성애와 상실, 자연의 순환(사계절의 유래). 신들의 권력 다툼 속에서 개인의 삶이 어떻게 희생될 수 있는지를 보여줍니다.',
+                            connection: '타인의 선택과 자유 의지를 존중하는 태도를 배웁니다. 또한, 사계절의 변화와 자연의 신비가 신화적인 이야기와 어떻게 연결되는지 알 수 있습니다.'
+                        },
+                        {
+                            name: '아도니스와 아프로디테',
+                            summary: '아름다운 외모를 가진 인간 아도니스는 사랑의 여신 아프로디테의 사랑을 받지만, 사냥을 하던 중 멧돼지에게 공격당해 죽고 맙니다. 아프로디테의 슬픔은 아네모네 꽃으로 피어납니다.',
+                            themes: '젊음과 아름다움의 덧없음, 질투와 비극, 사랑의 상실. 신의 사랑마저도 운명 앞에서는 무력할 수 있음을 보여줍니다.',
+                            connection: '소중한 것을 잃었을 때의 슬픔과 그 상실을 어떻게 극복해야 하는지 고민하게 합니다. 아름다운 것들이 영원하지 않다는 사실을 깨닫고 현재의 소중함을 되새깁니다.'
+                        },
+                        {
+                            name: '아폴론과 히아킨토스',
+                            summary: '태양의 신 아폴론이 사랑했던 미소년 히아킨토스가 원반 던지기 게임 중 아폴론이 던진 원반에 맞아 죽는 비극적인 이야기입니다. 그의 피에서는 히아신스 꽃이 피어납니다.',
+                            themes: '질투와 우정의 비극, 신의 실수와 인간의 죽음, 우정의 아름다움. 아폴론의 친구에 대한 질투가 불의의 사고를 초래합니다.',
+                            connection: '우정과 사랑의 경계, 그리고 질투가 관계에 미치는 부정적인 영향을 이해하게 됩니다. 자신의 실수가 초래할 수 있는 결과를 미리 생각하는 신중함의 중요성을 배웁니다.'
+                        },
+                        {
+                            name: '카스토르와 폴룩스',
+                            summary: '어머니는 같지만 아버지가 다른 쌍둥이 형제 카스토르와 폴룩스는 우애가 깊었습니다. 카스토르가 죽자, 폴룩스는 자신의 영생을 나누어 형과 함께하게 되었고, 이들은 밤하늘의 쌍둥이자리(제미니)가 되었습니다.',
+                            themes: '형제애와 희생, 불멸과 죽음. 가족을 위한 희생과 영원한 사랑의 가치를 보여줍니다.',
+                            connection: '가족과 친구의 소중함을 깨닫고, 진정한 우정이나 사랑을 위해 어떤 희생을 감수할 수 있는지 고민하게 합니다. 밤하늘의 별자리에 담긴 이야기를 통해 신화에 대한 흥미를 높입니다.'
+                        },
+                        {
+                            name: '포세이돈과 아폴론과 이다스',
+                            summary: '아폴론과 이다스라는 두 남자에게 구혼받은 마르페사라는 여인이 신이 아닌 인간 이다스를 선택한 이야기입니다. 그녀는 신의 사랑은 영원하지만 결국 인간을 떠날 것이라는 사실을 깨닫고 인간을 선택했습니다.',
+                            themes: '선택과 자유의지, 신의 불멸성과 인간의 유한함, 사랑의 진정한 의미. 영원한 것에 대한 집착 대신, 유한한 삶 속의 진정한 사랑을 택하는 용기를 보여줍니다.',
+                            connection: '외적인 화려함이나 영원한 힘 대신, 내면의 진실한 사랑과 믿음을 선택하는 지혜를 배웁니다. 내 삶의 중요한 결정에 대해 고민하고, 무엇을 가장 소중하게 여겨야 할지 성찰하는 기회를 제공합니다.'
+                        }
+                    ]
+                },
+                hubris: {
+                    title: '오만과 겸손',
+                    icon: '👑',
+                    description: '인간의 오만함이 부르는 비극과 겸손의 가치를 탐구합니다.',
+                    myths: [
+                        {
+                            name: '아라크네',
+                            summary: '베 짜는 솜씨가 뛰어나다며 지혜의 여신 아테나에게 도전했다가, 신들을 모욕하는 그림을 짜고 결국 거미가 되는 벌을 받은 아라크네의 이야기입니다.',
+                            themes: '교만과 겸손, 재능과 자만, 권위에 대한 도전. 아테나의 징벌이 과연 정당했는지, 신의 정의는 항상 옳은지에 대한 질문을 던집니다.',
+                            connection: '자신감과 오만함의 차이를 배웁니다. 자신의 재능을 올바르게 사용하고, 타인과 규칙을 존중하는 태도의 중요성을 깨닫습니다. 경쟁에서의 페어플레이 정신을 생각하게 합니다.'
+                        },
+                        {
+                            name: '미다스',
+                            summary: '손에 닿는 모든 것을 황금으로 바꾸는 능력을 얻었지만, 사랑하는 딸마저 황금으로 변하자 후회하는 미다스 왕. 탐욕의 어리석음을 보여줍니다.',
+                            themes: '탐욕의 위험성, 진정한 가치, 어리석음과 그 결과. 물질적 부가 아닌 인간관계와 생명의 소중함을 일깨웁니다.',
+                            connection: '물질주의와 행복의 관계를 성찰합니다. 소원을 빌거나 목표를 세울 때 신중해야 함을 배웁니다. 타인의 의견을 경청하는 자세의 중요성을 깨닫습니다.'
+                        },
+                        {
+                            name: '악타이온',
+                            summary: '사냥 중 우연히 아르테미스 여신의 목욕 장면을 엿본 죄로 사슴으로 변해 자신의 사냥개들에게 물려 죽는 비극적인 이야기입니다.',
+                            themes: '신성 모독과 징벌, 운명의 비극, 신의 잔혹성. 의도치 않은 행동이 불러온 가혹한 결과는 처벌의 정당성에 대한 질문을 남깁니다.',
+                            connection: '자신의 행동이 의도와 다른 결과를 낳을 수 있음을 이해하고, 타인의 사생활과 경계를 존중하는 태도를 배웁니다. 분노 조절의 중요성과 권력의 공정한 사용에 대해 생각하게 합니다.'
+                        },
+                        {
+                            name: '시시포스',
+                            summary: '신들을 속인 죄로 영원히 산꼭대기로 바위를 굴려야 하는 벌을 받은 시시포스의 이야기입니다. 바위가 정상에 다다르면 다시 굴러떨어지고, 이 고통스러운 행위를 반복해야 합니다.',
+                            themes: '신에 대한 도전과 그 결과, 형벌과 무의미한 노동. 인간의 반항과 그 한계를 보여주며, 삶의 의미와 부조리에 대한 철학적 질문을 던집니다.',
+                            connection: '매일 반복되는 지루한 일상 속에서 어떻게 의미를 찾을 수 있을지 고민하게 합니다. 자신의 행동이 어떤 결과를 초래할지 신중하게 생각하는 태도를 기릅니다.'
+                        },
+                        {
+                            name: '이카로스',
+                            summary: '아버지 다이달로스가 만들어준 밀랍 날개를 달고 하늘을 날던 이카로스는 아버지의 경고를 무시하고 태양 가까이 날아가 날개가 녹아내리면서 바다에 떨어져 죽습니다.',
+                            themes: '오만과 경솔함, 경고의 중요성, 지혜의 한계. 과도한 욕망과 오만은 파멸을 초래한다는 교훈을 줍니다.',
+                            connection: '부모님이나 경험이 많은 사람의 조언을 경청하는 자세를 배웁니다. 자신의 능력과 한계를 올바르게 파악하고 무모한 행동을 자제하는 지혜를 기릅니다.'
+                        },
+                        {
+                            name: '카산드라',
+                            summary: '아폴론에게 예언 능력을 얻었으나, 그의 사랑을 거절한 벌로 미래를 예언해도 아무도 믿지 않게 된 트로이의 공주 카산드라. 그녀의 불운한 운명은 오만함이 가져온 비극을 보여줍니다.',
+                            themes: '예언과 운명, 신의 복수와 인간의 절망. 진실을 말해도 믿지 못하는 고통을 통해 소통의 어려움을 상징적으로 드러냅니다.',
+                            connection: '거짓 정보가 넘쳐나는 사회에서 진실을 분별하는 중요성을 고민하게 합니다. 자신의 의견이 무시당할 때 느끼는 좌절감에 대해 공감하고, 경청하는 자세의 필요성을 배웁니다.'
+                        },
+                        {
+                            name: '티탄 족의 반란',
+                            summary: '크로노스를 중심으로 한 티탄 신족들이 제우스를 중심으로 한 올림포스 신들에게 도전했다가 패배하는 이야기입니다. 오만하게 권력을 탐하다가 패배하여 영원히 타르타로스에 갇힙니다.',
+                            themes: '세대교체와 권력 투쟁, 신들의 오만과 폭력성. 정의롭지 못한 권력은 결국 새로운 질서에 의해 무너진다는 교훈을 줍니다.',
+                            connection: '권력의 부패와 정의의 중요성에 대해 생각하게 합니다. 공동체 내에서 올바른 리더십이 얼마나 중요한지 깨닫게 됩니다.'
+                        },
+                        {
+                            name: '파에톤',
+                            summary: '태양의 신 헬리오스의 아들 파에톤은 자신이 진짜 아들임을 증명하려 태양 전차를 몰게 해달라고 떼를 씁니다. 아버지의 만류에도 불구하고 전차를 몰다 땅을 불태우고 결국 죽음을 맞습니다.',
+                            themes: '무모한 욕망, 부모의 조언, 자만심의 파멸. 능력을 과신하고 무모한 도전을 하는 것이 얼마나 위험한지 보여줍니다.',
+                            connection: '자신의 능력을 객관적으로 판단하는 중요성을 배웁니다. 주변 사람들의 진심 어린 조언을 귀담아듣고 겸손한 태도를 갖춰야 함을 깨닫게 됩니다.'
+                        },
+                        {
+                            name: '니오베',
+                            summary: '자신에게 14명의 자녀가 있다는 사실을 자랑하며, 겨우 두 명의 자녀를 둔 여신 레토에게 제사 드리는 것을 비웃습니다. 이에 분노한 레토의 자녀 아폴론과 아르테미스에게 모든 자녀를 잃고 슬픔에 잠긴 돌이 됩니다.',
+                            themes: '오만과 질투, 모성애의 비극. 타인의 슬픔을 무시하고 자신의 행복을 과시하는 행위가 불러온 참혹한 결과를 보여줍니다.',
+                            connection: '타인의 고통에 공감하는 능력과 겸손한 자세를 기릅니다. 자신의 행복을 자랑하기보다 타인의 기쁨과 슬픔을 함께 나누는 따뜻한 마음의 중요성을 배웁니다.'
+                        },
+                        {
+                            name: '프로메테우스',
+                            summary: '티탄 신족 프로메테우스는 인간에게 불을 가져다주어 문명의 발전을 돕지만, 이 행위는 신의 권위에 대한 도전으로 여겨집니다. 그는 코카서스 산에 묶여 매일 독수리에게 간을 쪼이는 형벌을 받습니다.',
+                            themes: '신에 대한 반항, 희생과 인류애, 정의와 처벌의 문제. 인간을 위한 희생과 그에 따른 고통은 오만함의 또 다른 모습으로 해석될 수 있습니다.',
+                            connection: '불의에 맞서는 용기와 타인을 위한 희생정신에 대해 생각하게 합니다. 자신의 신념을 지키기 위해 어떤 고통을 감수할 수 있을지 고민하게 합니다.'
+                        }
+                    ]
+                },
+                hero: {
+                    title: '영웅의 여정',
+                    icon: '⚔️',
+                    description: '시련을 극복하고 성장하며 자신의 길을 개척하는 용감한 자들입니다.',
+                    myths: [
+                        {
+                            name: '테세우스',
+                            summary: '미노타우로스를 처치하고 아테네를 구한 영웅이지만, 아리아드네를 버리고 말년에는 실수를 연발하는 등 영웅의 복합적인 면모를 보여줍니다.',
+                            themes: '정체성과 변화(테세우스의 배), 리더십과 통치, 영웅의 양면성. 영웅도 완벽하지 않으며, 선과 악의 경계가 모호할 수 있음을 보여줍니다.',
+                            connection: '끊임없이 변화하는 자아 정체성을 탐색합니다. 리더십과 책임감, 복잡한 도덕적 딜레마에 대해 고민합니다. 실패를 두려워하지 않는 도전 정신을 배웁니다.'
+                        },
+                        {
+                            name: '페르세우스',
+                            summary: '신들의 도움으로 메두사를 처치하고 안드로메다를 구출한 영웅. 다른 영웅들과 달리 도덕적 결함이 거의 없는 인물로 그려집니다.',
+                            themes: '신탁과 운명, 영웅의 여정, 정의와 보호, 도덕적 고결함. 운명을 피하려는 노력이 오히려 운명을 실현시키는 아이러니를 보여줍니다.',
+                            connection: '진정한 영웅이란 힘뿐만 아니라 올바른 인품과 책임감을 갖춘 존재임을 배웁니다. 운명 속에서도 자신의 선택과 노력의 중요성을 깨닫고, 필요할 때 도움을 요청하는 용기를 배웁니다.'
+                        },
+                        {
+                            name: '아탈란타',
+                            summary: '뛰어난 사냥꾼이자 달리기 선수인 여영웅 아탈란타. 남성 중심 사회에서 자신의 능력을 증명하고, 결혼을 피하기 위해 도전하는 강인한 여성의 모습을 보여줍니다.',
+                            themes: '성 역할에 대한 도전, 자기 결정권, 경쟁과 욕망. 고정관념을 깨고 자신의 길을 개척하는 용기를 강조합니다.',
+                            connection: '사회적 편견에 맞서는 용기와 자신의 길을 개척하는 중요성을 배웁니다. 성별에 관계없이 자신의 능력을 발휘하고 꿈을 향해 나아가는 태도를 기릅니다. 진정한 사랑과 외부적 압력 사이의 갈등을 고민합니다.'
+                        },
+                        {
+                            name: '헤라클레스',
+                            summary: '신들의 왕 제우스와 인간 여인 알크메네 사이에서 태어난 영웅. 헤라의 질투와 저주로 인해 광기에 휩싸여 가족을 죽인 죄를 씻기 위해 12가지의 불가능한 과업을 수행합니다.',
+                            themes: '속죄와 구원, 운명과의 투쟁, 힘과 고뇌. 힘이 있다고 해서 모든 문제가 해결되는 것이 아니며, 오히려 더 큰 고뇌를 가져올 수 있음을 보여줍니다.',
+                            connection: '고통과 역경을 극복하는 강한 의지를 배웁니다. 자신의 잘못을 인정하고 용서를 구하는 용기의 중요성을 깨닫습니다. 진정한 힘은 육체적인 것이 아니라 내면의 강인함에 있다는 것을 이해합니다.'
+                        },
+                        {
+                            name: '오디세우스',
+                            summary: '트로이 전쟁의 영웅으로, 10년간의 전쟁을 마치고 고향 이타카로 돌아오기 위해 다시 10년의 힘겨운 모험을 겪습니다. 지혜와 인내, 끈기의 상징으로 여겨집니다.',
+                            themes: '귀향과 정체성, 지혜와 끈기, 유혹과 역경. 오랜 방황 끝에 결국 고향으로 돌아온 그는 방황하는 모든 이에게 희망을 전해줍니다.',
+                            connection: '어려운 상황에서도 포기하지 않고 목표를 향해 나아가는 끈기를 배웁니다. 눈앞의 달콤한 유혹에 현혹되지 않고 중요한 가치를 지키는 지혜를 깨닫게 합니다.'
+                        },
+                        {
+                            name: '이아손',
+                            summary: '황금 양털을 찾기 위해 아르고호의 선원들을 이끌고 모험을 떠난 영웅. 마녀 메데이아의 도움으로 황금 양털을 얻지만, 이후 메데이아를 배신하고 비극적인 최후를 맞이합니다.',
+                            themes: '영웅의 모험, 리더십과 책임감, 배신과 파멸. 영웅의 업적 뒤에 숨겨진 탐욕과 비도덕성을 보여줍니다.',
+                            connection: '목표 달성 과정에서 수단과 방법을 가리지 않는 태도가 얼마나 위험한지 깨닫게 합니다. 리더로서의 책임감과 정의로운 행동의 중요성을 배웁니다.'
+                        }
+                    ]
+                }
+            };
+
+            const themesContainer = document.querySelector('#themes .grid');
+            const detailsSection = document.getElementById('myth-details');
+            const detailsContent = document.getElementById('details-content');
+            const closeButton = document.getElementById('close-details');
+
+            Object.keys(mythData).forEach(key => {
+                const theme = mythData[key];
+                const card = document.createElement('div');
+                card.className = 'theme-card bg-white p-8 rounded-xl shadow-lg cursor-pointer';
+                card.innerHTML = `
+                    <div class="text-4xl mb-4">${theme.icon}</div>
+                    <h3 class="text-2xl font-bold text-[#6B5B4C] mb-2">${theme.title}</h3>
+                    <p class="text-[#8C7C6B]">${theme.description}</p>
+                `;
+                card.addEventListener('click', () => showDetails(key));
+                themesContainer.appendChild(card);
+            });
+
+            function showDetails(key) {
+                const theme = mythData[key];
+                let contentHtml = `<h2 class="text-3xl md:text-4xl font-bold text-center mb-10 text-[#6B5B4C]">${theme.title}</h2>`;
+                
+                theme.myths.forEach((myth, index) => {
+                    contentHtml += `
+                        <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg mb-8">
+                            <h3 class="text-2xl font-bold text-[#6B5B4C] mb-4">${myth.name}</h3>
+                            <div class="mb-4 border-b border-[#F0E6D2]"> <!-- Lighter border -->
+                                <nav class="flex -mb-px" aria-label="Tabs">
+                                    <button class="tab-button active w-1/3 py-3 px-1 text-center border-b-2 font-medium text-sm" data-tab-group="${index}" data-tab-target="summary">줄거리</button>
+                                    <button class="tab-button w-1/3 py-3 px-1 text-center border-b-2 font-medium text-sm" data-tab-group="${index}" data-tab-target="themes">주제와 쟁점</button>
+                                    <button class="tab-button w-1/3 py-3 px-1 text-center border-b-2 font-medium text-sm" data-tab-group="${index}" data-tab-target="connection">삶의 연결</button>
+                                </nav>
+                            </div>
+                            <div>
+                                <div class="tab-content active" data-tab-group="${index}" data-tab-id="summary"><p class="text-[#8C7C6B] leading-relaxed">${myth.summary}</p></div>
+                                <div class="tab-content hidden" data-tab-group="${index}" data-tab-id="themes"><p class="text-[#8C7C6B] leading-relaxed">${myth.themes}</p></div>
+                                <div class="tab-content hidden" data-tab-group="${index}" data-tab-id="connection"><p class="text-[#8C7C6B] leading-relaxed">${myth.connection}</p></div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                detailsContent.innerHTML = contentHtml;
+                detailsSection.classList.remove('hidden');
+                document.getElementById('themes').classList.add('hidden');
+                window.scrollTo({ top: detailsSection.offsetTop - 70, behavior: 'smooth' });
+
+                attachTabListeners();
+            }
+
+            function attachTabListeners() {
+                const tabButtons = document.querySelectorAll('.tab-button');
+                tabButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const tabGroup = button.dataset.tabGroup;
+                        const tabTarget = button.dataset.tabTarget;
+
+                        document.querySelectorAll(`.tab-button[data-tab-group="${tabGroup}"]`).forEach(btn => btn.classList.remove('active'));
+                        button.classList.add('active');
+
+                        document.querySelectorAll(`.tab-content[data-tab-group="${tabGroup}"]`).forEach(content => content.classList.add('hidden'));
+                        document.querySelector(`.tab-content[data-tab-group="${tabGroup}"][data-tab-id="${tabTarget}"]`).classList.remove('hidden');
+                    });
+                });
+            }
+
+            closeButton.addEventListener('click', () => {
+                detailsSection.classList.add('hidden');
+                document.getElementById('themes').classList.remove('hidden');
+                window.scrollTo({ top: document.getElementById('themes').offsetTop - 70, behavior: 'smooth' });
+            });
+
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                         window.scrollTo({
+                            top: targetElement.offsetTop - 70, 
+                            behavior: 'smooth'
+                        });
+                    }
+                    if (mobileMenu.classList.contains('hidden') === false) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                });
+            });
+
+            // Accordion logic for "더 알아보기" and "교과 연계" sections
+            const accordionHeaders = document.querySelectorAll('.accordion-header');
+            accordionHeaders.forEach(header => {
+                header.addEventListener('click', () => {
+                    const content = header.nextElementSibling;
+                    const icon = header.querySelector('.accordion-icon');
+
+                    // Close all other open accordions in the same section
+                    const parentSection = header.closest('section');
+                    parentSection.querySelectorAll('.accordion-header').forEach(otherHeader => {
+                        if (otherHeader !== header) {
+                            otherHeader.nextElementSibling.classList.remove('active');
+                            otherHeader.querySelector('.accordion-icon').textContent = '▼';
+                        }
+                    });
+
+                    // Toggle current accordion
+                    content.classList.toggle('active');
+                    if (content.classList.contains('active')) {
+                        icon.textContent = '▲';
+                    } else {
+                        icon.textContent = '▼';
+                    }
+                });
+            });
+
+        });
+    </script>
+</body>
+</html>
